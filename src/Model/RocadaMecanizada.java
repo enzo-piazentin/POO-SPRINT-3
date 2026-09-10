@@ -7,7 +7,12 @@ public class RocadaMecanizada extends IntervencaoOperacional {
     }
 
     @Override
-    public void executarServico() {
-        System.out.println("Executando roçada mecanizada.");
+    public void executarServico(TrechoRodovia trecho) {
+        System.out.println("Executando roçada mecanizada no trecho KM " + trecho.getKm() + ".");
+    }
+
+    @Override
+    public String getDescricao(TrechoRodovia trecho) {
+        return "KM " + trecho.getKm() + " -> Roçada Mecanizada (responsável: " + responsavel + ")";
     }
 }
