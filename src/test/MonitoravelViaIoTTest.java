@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
+/** Teste: cria implementação anônima de MonitoravelViaIoT. */
 public interface MonitoravelViaIoTTest {
 
     @Test
@@ -20,4 +21,5 @@ public interface MonitoravelViaIoTTest {
 
         assertNotNull(monitoravel);
     }
+
 }

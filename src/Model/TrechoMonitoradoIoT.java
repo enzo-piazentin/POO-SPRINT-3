@@ -1,5 +1,6 @@
 package Model;
 
+/** Simple: trecho que transmite dados via IoT. */
 public class TrechoMonitoradoIoT extends TrechoRodovia implements MonitoravelViaIoT {
 
     public TrechoMonitoradoIoT(int km, double alturaVegetacao, String tipoTerreno) {

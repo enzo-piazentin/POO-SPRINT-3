@@ -1,5 +1,6 @@
 package Model;
 
+/** Simple: pulverização. */
 public class Pulverizacao extends IntervencaoOperacional {
 
     public Pulverizacao(String responsavel) {

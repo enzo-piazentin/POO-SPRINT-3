@@ -1,5 +1,6 @@
 package Model;
 
+/** Simple: roçada mecanizada. */
 public class RocadaMecanizada extends IntervencaoOperacional {
 
     public RocadaMecanizada(String responsavel) {

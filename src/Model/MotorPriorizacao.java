@@ -3,6 +3,7 @@ package Model;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Simple: motor que decide intervenção por altura da vegetação. */
 public class MotorPriorizacao {
 
     public List<String> gerarRelatorio(TrechoRodovia[] trechos) {
@@ -18,17 +19,13 @@ public class MotorPriorizacao {
             } else if (trecho.getAlturaVegetacao() >= 60) {
                 intervencao = new RocadaManual("Equipe Manual");
             } else if (trecho.getAlturaVegetacao() >= 30) {
-                // exemplo: para alturas intermediárias podemos pulverizar
                 intervencao = new Pulverizacao("Equipe Pulverização");
             }
 
             if (intervencao != null) {
-                // executar a intervenção de forma polimórfica
                 intervencao.executarServico(trecho);
-                // adicionar descrição ao relatório
                 relatorio.add(intervencao.getDescricao(trecho));
             } else {
-                // tratar caso sem intervenção necessária
                 relatorio.add("KM " + trecho.getKm() + " -> Sem intervenção necessária");
             }
         }

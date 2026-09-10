@@ -1,5 +1,6 @@
 package Model;
 
+/** Simple: ação operacional executada em um trecho. */
 public abstract class IntervencaoOperacional {
 
     protected final String responsavel;
@@ -8,10 +9,10 @@ public abstract class IntervencaoOperacional {
         this.responsavel = responsavel;
     }
 
-    // Agora a intervenção conhece o trecho onde atua
+    /** Executa o serviço no trecho fornecido. */
     public abstract void executarServico(TrechoRodovia trecho);
 
-    // Descrição textual para relatórios
+    /** Retorna descrição curta da intervenção para relatórios. */
     public abstract String getDescricao(TrechoRodovia trecho);
 
     @Override

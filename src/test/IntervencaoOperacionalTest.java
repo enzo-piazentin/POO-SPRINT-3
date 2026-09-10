@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/** Teste: verifica que IntervencaoOperacional é abstrata. */
 class IntervencaoOperacionalTest {
 
     @Test

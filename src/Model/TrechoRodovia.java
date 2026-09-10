@@ -2,12 +2,13 @@ package Model;
 
 import java.util.Objects;
 
+/** Simple: representa um trecho da rodovia. */
 public class TrechoRodovia {
 
     private final int km;
     private double alturaVegetacao;
     private final String tipoTerreno;
-    private Integer equipeId; // opcional: ligação com equipe de manutenção
+    private Integer equipeId;
 
     public TrechoRodovia(int km, double alturaVegetacao, String tipoTerreno) {
         this(km, alturaVegetacao, tipoTerreno, null);
@@ -22,6 +23,7 @@ public class TrechoRodovia {
         this.equipeId = equipeId;
     }
 
+    /** Crescimento diário baseado no tipo de terreno. */
     public double calcularCrescimentoDiario() {
         if (tipoTerreno.equalsIgnoreCase("umido")) {
             return 5.0;
@@ -29,6 +31,7 @@ public class TrechoRodovia {
         return 2.0;
     }
 
+    /** Atualiza a altura da vegetação. */
     public void atualizarVegetacao() {
         alturaVegetacao += calcularCrescimentoDiario();
     }
