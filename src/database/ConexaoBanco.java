@@ -1,20 +1,61 @@
 package database;
 
-import exception.BancoDadosException;
 import exception.CredenciaisInvalidasException;
-import java.sql.*;
 
-/** Conexão Oracle centralizada. Nunca versiona credenciais reais. */
-public final class ConexaoBanco {
-    private static final ConexaoBanco INSTANCE=new ConexaoBanco();
-    private final String url=env("DB_URL","jdbc:oracle:thin:@//oracle.fiap.com.br:1521/ORCL");
-    private final String user=env("DB_USER","");
-    private final String password=env("DB_PASSWORD","");
-    private ConexaoBanco(){}
-    public static ConexaoBanco getInstancia(){return INSTANCE;}
-    public static Connection getConexao(){return INSTANCE.conectar();}
-    public Connection conectar(){try{Class.forName("oracle.jdbc.driver.OracleDriver");if(user.isBlank()||password.isBlank())throw new CredenciaisInvalidasException("Defina DB_USER e DB_PASSWORD antes de executar.");return DriverManager.getConnection(url,user,password);}catch(CredenciaisInvalidasException e){throw e;}catch(ClassNotFoundException e){throw new BancoDadosException("Driver ojdbc17.jar não encontrado no classpath",e);}catch(SQLException e){if(e.getErrorCode()==1017)throw new CredenciaisInvalidasException("Usuário ou senha Oracle inválidos",e);throw new BancoDadosException("Não foi possível conectar ao Oracle",e);}}
-    public void desconectar(){/* conexões são fechadas por try-with-resources nos DAOs */}
-    public static void fechar(Connection c){if(c!=null)try{c.close();}catch(SQLException e){throw new BancoDadosException("Erro ao fechar conexão",e);}}
-    private static String env(String key,String fallback){String value=System.getenv(key);return value==null||value.isBlank()?fallback:value;}
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class ConexaoBanco {
+
+    // Credenciais do banco Oracle FIAP
+    private static final String HOST = "oracle.fiap.com.br";
+    private static final String PORT = "1521";
+    private static final String SID = "ORCL";
+    private static final String USER = "seu_usuario_fiap";  // Substituir
+    private static final String PASSWORD = "sua_senha_fiap"; // Substituir
+
+    /**
+     * Cria uma nova conexão com o Oracle.
+     */
+    public static Connection getConexao() {
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+
+            String url = "jdbc:oracle:thin:@" + HOST + ":" + PORT + ":" + SID;
+
+            Connection conexao = DriverManager.getConnection(url, USER, PASSWORD);
+
+            System.out.println("✅ Conexão criada com sucesso!");
+            return conexao;
+
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Driver Oracle não encontrado: " + e.getMessage(), e);
+        } catch (SQLException e) {
+            // Verifica se é erro de credenciais inválidas (ORA-01017)
+            if (e.getErrorCode() == 1017) {
+                String usuario = USER.substring(0, Math.min(3, USER.length())) + "***";
+                throw new CredenciaisInvalidasException(
+                        "Credenciais inválidas para o usuário '" + usuario + "'. " +
+                                "Verifique suas credenciais em ConexaoBanco.java ou use variáveis de ambiente DB_USER e DB_PASSWORD.",
+                        e
+                );
+            }
+            throw new RuntimeException("Erro ao conectar ao Oracle: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Fecha uma conexão aberta.
+     */
+    public static void fechar(Connection conexao) {
+        try {
+            if (conexao != null && !conexao.isClosed()) {
+                conexao.close();
+                System.out.println("🔌 Conexão fechada.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao fechar conexão: " + e.getMessage());
+        }
+    }
 }
