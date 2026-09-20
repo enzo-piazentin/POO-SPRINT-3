@@ -2,6 +2,25 @@
 
 Projeto Java de persistência em Oracle usando JDBC, com CRUD de equipes, trechos, intervenções e geração de relatório de prioridade.
 
+## Índice
+
+| Item | Link |
+|---|---|
+| Visão geral | [Acessar seção](#visão-geral) |
+| Estrutura principal | [Acessar seção](#estrutura-principal) |
+| Pré-requisitos | [Acessar seção](#pré-requisitos) |
+| Configuração do banco Oracle | [Acessar seção](#configuração-do-banco-oracle) |
+| Criação das tabelas | [Acessar seção](#criação-das-tabelas) |
+| Como rodar no IntelliJ IDEA | [Acessar seção](#como-rodar-no-intellij-idea) |
+| Menu do sistema | [Acessar seção](#menu-do-sistema) |
+| Exemplos de teste | [Acessar seção](#exemplos-de-teste) |
+| Validações implementadas | [Acessar seção](#validações-implementadas) |
+| Como rodar pelo terminal | [Acessar seção](#como-rodar-pelo-terminal-sem-intellij) |
+| Problemas comuns e correções | [Acessar seção](#problemas-comuns-e-correções) |
+| Observações finais | [Acessar seção](#observações-finais) |
+| Dica | [Acessar seção](#dica) |
+| Funcional | [Acessar seção](#funcional) |
+
 ## Visão geral
 
 O sistema permite:
