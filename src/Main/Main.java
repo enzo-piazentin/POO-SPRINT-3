@@ -23,12 +23,21 @@ public class Main {
     private static final IntervencaoOperacionalDAO INTERVENCOES = new IntervencaoOperacionalDAO();
 
     public static void main(String[] args) {
-        try (Connection ignored = ConexaoBanco.getConexao()) {
+        Connection conexao = null;
+
+        try {
+            conexao = ConexaoBanco.getConexao();
             executarMenu();
+
         } catch (CredenciaisInvalidasException e) {
             System.err.println(e.getMessage());
+
         } catch (RuntimeException e) {
             System.err.println("Erro ao iniciar o sistema: " + e.getMessage());
+            e.printStackTrace();
+
+        } finally {
+            ConexaoBanco.fechar(conexao);
         }
     }
 
