@@ -291,8 +291,19 @@ Se todas as tabelas estiverem vazias, o projeto pode iniciar normalmente e você
 
 <img width="1197" height="402" alt="Captura de tela 2026-09-20 154153" src="https://github.com/user-attachments/assets/7085ba83-6652-415a-ab07-5b6306604a8c" />
 
+<img width="686" height="267" alt="image" src="https://github.com/user-attachments/assets/8145222b-4df3-4ac8-8a45-5d299c86293f" />
+
+<img width="807" height="212" alt="image" src="https://github.com/user-attachments/assets/f11afc03-ad4f-4c62-86cb-fccdbfe3d53f" />
+
+<img width="807" height="212" alt="image" src="https://github.com/user-attachments/assets/5cbe478a-58e1-4f3b-8c8a-16fb1053638d" />
+
+<img width="963" height="131" alt="image" src="https://github.com/user-attachments/assets/0bfdf07e-a08d-4b9b-9851-cfeed4ede501" />
+
 <img width="1462" height="792" alt="Captura de tela 2026-09-20 154232" src="https://github.com/user-attachments/assets/9415f937-2ca0-46b1-914c-7078d8050646" />
 
 <img width="1411" height="298" alt="Captura de tela 2026-09-20 154257" src="https://github.com/user-attachments/assets/ba8a13f3-dddc-4618-90f5-cdf90957893d" />
+
+<img width="1307" height="148" alt="image" src="https://github.com/user-attachments/assets/917ee76e-97b4-4423-b45c-79a9d001dc75" />
+
 
 <img width="568" height="387" alt="Captura de tela 2026-09-20 154322" src="https://github.com/user-attachments/assets/daf8951f-82ce-49e3-b06a-3c54714de1b4" />
