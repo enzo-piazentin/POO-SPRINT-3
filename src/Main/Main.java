@@ -1,24 +1,31 @@
 package Main;
 
-import Model.MotorPriorizacao;
 import Model.TrechoRodovia;
-import Model.TrechoMonitoradoIoT;
+import dao.*;
+import database.ConexaoBanco;
+import model.*;
+import service.GeradorRelatorio;
 
-/** Simple: classe principal para demonstração. */
+/** Demonstração completa do CRUD e da persistência do relatório. */
 public class Main {
-
     public static void main(String[] args) {
+        ConexaoBanco.getInstancia().conectar();
+        EquipeManutencaoDAO equipes=new EquipeManutencaoDAO();
+        int equipeId=equipes.inserir(new EquipeManutencao("Equipe Norte","Roçada"));
+        System.out.println(equipes.buscarPorId(equipeId));
+        equipes.atualizar(new EquipeManutencao(equipeId,"Equipe Norte","Roçada e poda"));
 
-        TrechoRodovia[] trechos = {
-                new TrechoMonitoradoIoT(10, 120, "umido"),
-                new TrechoRodovia(25, 80, "seco"),
-                new TrechoRodovia(40, 30, "seco")
-        };
+        TrechoRodoviaDAO trechos=new TrechoRodoviaDAO();
+        TrechoRodovia trecho=new TrechoRodovia(10,120,"umido",equipeId);
+        trechos.inserir(trecho);
+        System.out.println(trechos.listarTodas());
 
-        MotorPriorizacao motor = new MotorPriorizacao();
-
-        var relatorio = motor.gerarRelatorio(trechos);
-
-        relatorio.forEach(System.out::println);
+        IntervencaoOperacionalDAO intervencoes=new IntervencaoOperacionalDAO();
+        int intervencaoId=intervencoes.inserir(new IntervencaoRegistro(10,"ROÇADA_MECANIZADA","Equipe Norte"));
+        System.out.println(intervencoes.buscarPorId(intervencaoId));
+        new GeradorRelatorio().gerarRelatorio(trechos.listarTodas().toArray(TrechoRodovia[]::new));
+        new RelatorioPrioridadeDAO().listarTodas().forEach(System.out::println);
+        // Descomente após validar os registros: equipes.deletar(equipeId); trechos.deletar(10); intervencoes.deletar(intervencaoId);
+        ConexaoBanco.getInstancia().desconectar();
     }
 }
