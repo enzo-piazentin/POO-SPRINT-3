@@ -1,65 +1,59 @@
-# POO Sprint 3 — persistência Oracle/JDBC
+package Main;
 
-## Checklist de entrega
+import Model.MotorPriorizacao;
+import Model.TrechoRodovia;
+import dao.EquipeManutencaoDAO;
+import dao.IntervencaoOperacionalDAO;
+import dao.RelatorioPrioridadeDAO;
+import dao.TrechoRodoviaDAO;
+import database.ConexaoBanco;
+import exception.CredenciaisInvalidasException;
+import model.EquipeManutencao;
+import model.IntervencaoRegistro;
+import service.GeradorRelatorio;
 
-- [x] `seu-script-criacao.sql`: cria as tabelas `EQUIPE_MANUTENCAO`, `TRECHO_RODOVIA`, `INTERVENCAO_OPERACIONAL` e `RELATORIO_PRIORIDADE`, baseadas nas entidades utilizadas pelo projeto.
-- [x] `seu-script-dados.sql`: contém dados de teste para equipes, trechos e intervenção.
-- [ ] Banco configurado e scripts executados: confirmar a execução no Oracle SQL Developer/SQL*Plus do laboratório.
-- [x] `ConexaoBanco.java`: contém o host, porta, SID, usuário e senha Oracle configurados, além de `getConexao()` e `fechar(Connection)`.
-- [x] DAOs criados para as entidades persistentes: equipe, trecho e intervenção, com inserir, buscar, listar, atualizar e deletar.
-- [x] `RelatorioPrioridadeDAO` criado e integrado ao `GeradorRelatorio`.
-- [x] `GeradorRelatorio.java` imprime o relatório e salva seu histórico no banco.
-- [x] `Main.java` demonstra conexão, inserção, consulta, atualização, geração do relatório e consulta do histórico.
-- [ ] Testes executados com sucesso: os testes unitários existentes precisam ser executados; o teste de integração depende do acesso ao Oracle.
-- [x] README atualizado com instruções de configuração e execução.
+import java.sql.Connection;
 
-> Observação: o enunciado menciona `ConexaoBD.java`, mas o projeto utiliza o nome `ConexaoBanco.java`. A implementação foi mantida com o nome existente no repositório.
+/** Demonstração de conexão, CRUD e persistência do relatório. */
+public class Main {
+    public static void main(String[] args) {
+        try (Connection conexao = ConexaoBanco.getConexao()) {
+            EquipeManutencaoDAO equipes = new EquipeManutencaoDAO();
+            int equipeId = equipes.inserir(new EquipeManutencao("Equipe Norte", "Roçada"));
+            System.out.println("Equipe inserida: " + equipes.buscarPorId(equipeId));
 
-## Configuração do banco
+            equipes.atualizar(new EquipeManutencao(equipeId, "Equipe Norte", "Roçada e poda"));
+            System.out.println("Equipe atualizada: " + equipes.buscarPorId(equipeId));
 
-A conexão está em `src/database/ConexaoBanco.java` e utiliza o Oracle FIAP:
+            TrechoRodoviaDAO trechos = new TrechoRodoviaDAO();
+            int kmTrecho = 101;
+            TrechoRodovia trecho = new TrechoRodovia(kmTrecho, 120, "umido", equipeId);
+            trechos.inserir(trecho);
+            System.out.println("Trechos cadastrados: " + trechos.listarTodas());
 
-- host: `oracle.fiap.com.br`
-- porta: `1521`
-- SID: `ORCL`
-- usuário e senha: configurados nas constantes `USER` e `PASSWORD`
+            IntervencaoOperacionalDAO intervencoes = new IntervencaoOperacionalDAO();
+            int intervencaoId = intervencoes.inserir(
+                    new IntervencaoRegistro(kmTrecho, "ROCADA_MECANIZADA", "Equipe Norte")
+            );
+            System.out.println("Intervenção inserida: " + intervencoes.buscarPorId(intervencaoId));
 
-Por segurança, não publique credenciais reais no GitHub. Caso este repositório seja público, altere a senha do banco e remova as credenciais do código antes da entrega final. O ideal é carregar esses valores por variáveis de ambiente ou por configuração local ignorada pelo Git.
+            TrechoRodovia[] trechosParaRelatorio = trechos.listarTodas().toArray(new TrechoRodovia[0]);
+            new GeradorRelatorio().gerarRelatorio(trechosParaRelatorio);
 
-## Execução dos scripts
+            System.out.println("Histórico de relatórios:");
+            new RelatorioPrioridadeDAO().listarTodas().forEach(System.out::println);
 
-Execute os scripts nesta ordem no Oracle SQL Developer ou SQL*Plus:
+            // Excluir em ordem reversa para respeitar FKs:
+            // intervencoes.deletar(intervencaoId);
+            // trechos.deletar(kmTrecho);
+            // equipes.deletar(equipeId);
 
-1. `seu-script-criacao.sql`;
-2. `seu-script-dados.sql`.
-
-O script de criação remove as tabelas anteriores e recria as tabelas com suas chaves primárias e estrangeiras. O script de dados deve ser executado após a criação.
-
-## Compilação e execução
-
-Linux/macOS:
-
-```bash
-javac -cp "lib/ojdbc17.jar" -d out $(find src -name "*.java")
-java -cp "out:lib/ojdbc17.jar" Main.Main
-```
-
-Windows PowerShell:
-
-```powershell
-javac -cp "lib/ojdbc17.jar" -d out (Get-ChildItem -Recurse src -Filter *.java).FullName
-java -cp "out;lib/ojdbc17.jar" Main.Main
-```
-
-O `Main` cria valores em Java e os envia ao Oracle pelos DAOs. As conexões, `PreparedStatement` e `ResultSet` são fechados com try-with-resources; a conexão principal é fechada no bloco `finally`.
-
-## Testes
-
-Os testes atuais estão em `src/test` e validam as regras da Sprint 2. Para validar a Sprint 3 completamente, execute também o `Main` com o Oracle acessível e verifique:
-
-- conexão realizada com sucesso;
-- inserção, consulta e atualização de equipe;
-- inserção e listagem de trecho;
-- inserção e consulta de intervenção;
-- relatório salvo em `RELATORIO_PRIORIDADE`;
-- histórico de relatórios retornado pelo DAO.
+        } catch (CredenciaisInvalidasException e) {
+            System.err.println(e.getMessage());
+            System.err.println(e.getDicaCorrecao());
+        } catch (RuntimeException e) {
+            System.err.println("Erro durante a demonstração: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}

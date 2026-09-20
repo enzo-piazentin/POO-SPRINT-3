@@ -1,71 +1,62 @@
-package Main;
+package database;
 
-import Model.TrechoRodovia;
-import dao.EquipeManutencaoDAO;
-import dao.IntervencaoOperacionalDAO;
-import dao.RelatorioPrioridadeDAO;
-import dao.TrechoRodoviaDAO;
-import database.ConexaoBanco;
 import exception.CredenciaisInvalidasException;
-import model.EquipeManutencao;
-import model.IntervencaoRegistro;
-import service.GeradorRelatorio;
 
-/** Demonstração de conexão, inserção, CRUD e persistência do relatório. */
-public class Main {
-    public static void main(String[] args) {
-        java.sql.Connection conexao = null;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
+public class ConexaoBanco {
+
+    private static final String HOST = getEnv("DB_HOST", "oracle.fiap.com.br");
+    private static final String PORT = getEnv("DB_PORT", "1521");
+    private static final String SID = getEnv("DB_SID", "ORCL");
+    private static final String USER = getEnv("DB_USER", "");
+    private static final String PASSWORD = getEnv("DB_PASSWORD", "");
+
+    public static Connection getConexao() {
         try {
-            // A classe ConexaoBanco foi mantida no formato original.
-            conexao = ConexaoBanco.getConexao();
+            if (USER.isBlank() || PASSWORD.isBlank()) {
+                throw new CredenciaisInvalidasException(
+                        "Credenciais ausentes. Defina DB_USER e DB_PASSWORD antes de executar o projeto."
+                );
+            }
 
-            EquipeManutencaoDAO equipes = new EquipeManutencaoDAO();
-            int equipeId = equipes.inserir(
-                    new EquipeManutencao("Equipe Norte", "Roçada")
-            );
-            System.out.println("Equipe inserida: " + equipes.buscarPorId(equipeId));
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            String url = "jdbc:oracle:thin:@" + HOST + ":" + PORT + ":" + SID;
+            Connection conexao = DriverManager.getConnection(url, USER, PASSWORD);
+            System.out.println("✅ Conexão criada com sucesso!");
+            return conexao;
 
-            equipes.atualizar(new EquipeManutencao(
-                    equipeId, "Equipe Norte", "Roçada e poda"
-            ));
-            System.out.println("Equipe atualizada: " + equipes.buscarPorId(equipeId));
-
-            TrechoRodoviaDAO trechos = new TrechoRodoviaDAO();
-            TrechoRodovia trecho = new TrechoRodovia(
-                    10, 120, "umido", equipeId
-            );
-            trechos.inserir(trecho);
-            System.out.println("Trechos cadastrados: " + trechos.listarTodas());
-
-            IntervencaoOperacionalDAO intervencoes = new IntervencaoOperacionalDAO();
-            int intervencaoId = intervencoes.inserir(new IntervencaoRegistro(
-                    10, "ROCADA_MECANIZADA", "Equipe Norte"
-            ));
-            System.out.println("Intervenção inserida: "
-                    + intervencoes.buscarPorId(intervencaoId));
-
-            TrechoRodovia[] trechosParaRelatorio = trechos.listarTodas()
-                    .toArray(new TrechoRodovia[0]);
-            new GeradorRelatorio().gerarRelatorio(trechosParaRelatorio);
-
-            System.out.println("Histórico de relatórios:");
-            new RelatorioPrioridadeDAO().listarTodas()
-                    .forEach(System.out::println);
-
-            // Para testar as exclusões, execute-as nesta ordem devido às FKs:
-            // intervencoes.deletar(intervencaoId);
-            // trechos.deletar(trecho.getKm());
-            // equipes.deletar(equipeId);
-
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Driver Oracle não encontrado: " + e.getMessage(), e);
         } catch (CredenciaisInvalidasException e) {
-            System.err.println(e.getMessage());
-            System.err.println(e.getDicaCorrecao());
-        } catch (RuntimeException e) {
-            System.err.println("Erro durante a demonstração: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            ConexaoBanco.fechar(conexao);
+            throw e;
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1017) {
+                String usuario = USER.isBlank() ? "<usuario não informado>" : USER.substring(0, Math.min(3, USER.length())) + "***";
+                throw new CredenciaisInvalidasException(
+                        "Credenciais inválidas para o usuário '" + usuario + "'. Verifique DB_USER e DB_PASSWORD.",
+                        e
+                );
+            }
+            throw new RuntimeException("Erro ao conectar ao Oracle: " + e.getMessage(), e);
         }
+    }
+
+    public static void fechar(Connection conexao) {
+        try {
+            if (conexao != null && !conexao.isClosed()) {
+                conexao.close();
+                System.out.println("🔌 Conexão fechada.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao fechar conexão: " + e.getMessage());
+        }
+    }
+
+    private static String getEnv(String key, String fallback) {
+        String value = System.getenv(key);
+        return value == null || value.isBlank() ? fallback : value;
     }
 }
