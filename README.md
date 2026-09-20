@@ -1,59 +1,66 @@
-package Main;
+# POO Sprint 3 — persistência Oracle/JDBC
 
-import Model.MotorPriorizacao;
-import Model.TrechoRodovia;
-import dao.EquipeManutencaoDAO;
-import dao.IntervencaoOperacionalDAO;
-import dao.RelatorioPrioridadeDAO;
-import dao.TrechoRodoviaDAO;
-import database.ConexaoBanco;
-import exception.CredenciaisInvalidasException;
-import model.EquipeManutencao;
-import model.IntervencaoRegistro;
-import service.GeradorRelatorio;
+## Diagnóstico do erro ORA-04043
 
-import java.sql.Connection;
+O erro abaixo:
 
-/** Demonstração de conexão, CRUD e persistência do relatório. */
-public class Main {
-    public static void main(String[] args) {
-        try (Connection conexao = ConexaoBanco.getConexao()) {
-            EquipeManutencaoDAO equipes = new EquipeManutencaoDAO();
-            int equipeId = equipes.inserir(new EquipeManutencao("Equipe Norte", "Roçada"));
-            System.out.println("Equipe inserida: " + equipes.buscarPorId(equipeId));
+```text
+ORA-04043: o objeto EQUIPE_MANUTENCAO não existe
+```
 
-            equipes.atualizar(new EquipeManutencao(equipeId, "Equipe Norte", "Roçada e poda"));
-            System.out.println("Equipe atualizada: " + equipes.buscarPorId(equipeId));
+significa que a tabela `EQUIPE_MANUTENCAO` não existe no schema Oracle usado pela conexão, ou que os scripts foram executados com outro usuário.
 
-            TrechoRodoviaDAO trechos = new TrechoRodoviaDAO();
-            int kmTrecho = 101;
-            TrechoRodovia trecho = new TrechoRodovia(kmTrecho, 120, "umido", equipeId);
-            trechos.inserir(trecho);
-            System.out.println("Trechos cadastrados: " + trechos.listarTodas());
+A classe `ConexaoBanco` conseguiu abrir a conexão; portanto, o problema não é o driver nem a senha. O erro ocorreu ao inserir a equipe no `EquipeManutencaoDAO`.
 
-            IntervencaoOperacionalDAO intervencoes = new IntervencaoOperacionalDAO();
-            int intervencaoId = intervencoes.inserir(
-                    new IntervencaoRegistro(kmTrecho, "ROCADA_MECANIZADA", "Equipe Norte")
-            );
-            System.out.println("Intervenção inserida: " + intervencoes.buscarPorId(intervencaoId));
+## Como corrigir no Oracle
 
-            TrechoRodovia[] trechosParaRelatorio = trechos.listarTodas().toArray(new TrechoRodovia[0]);
-            new GeradorRelatorio().gerarRelatorio(trechosParaRelatorio);
+Execute o script de criação conectado com o mesmo usuário configurado em `ConexaoBanco.java`:
 
-            System.out.println("Histórico de relatórios:");
-            new RelatorioPrioridadeDAO().listarTodas().forEach(System.out::println);
+```sql
+SELECT USER FROM DUAL;
 
-            // Excluir em ordem reversa para respeitar FKs:
-            // intervencoes.deletar(intervencaoId);
-            // trechos.deletar(kmTrecho);
-            // equipes.deletar(equipeId);
+@seu-script-criacao.sql
+@seu-script-dados.sql
 
-        } catch (CredenciaisInvalidasException e) {
-            System.err.println(e.getMessage());
-            System.err.println(e.getDicaCorrecao());
-        } catch (RuntimeException e) {
-            System.err.println("Erro durante a demonstração: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-}
+SELECT TABLE_NAME
+FROM USER_TABLES
+WHERE TABLE_NAME IN (
+    'EQUIPE_MANUTENCAO',
+    'TRECHO_RODOVIA',
+    'INTERVENCAO_OPERACIONAL',
+    'RELATORIO_PRIORIDADE'
+);
+```
+
+Se o resultado não listar as quatro tabelas, o script não foi executado no schema correto. Execute-o no Oracle SQL Developer ou SQL*Plus antes de iniciar o Java.
+
+## Tratamento implementado
+
+Foi criada a exceção `exception.TabelaNaoEncontradaException`. O `EquipeManutencaoDAO` agora identifica o código Oracle `4043` e exibe uma mensagem orientando a executar `seu-script-criacao.sql` com o mesmo usuário da conexão, em vez de apresentar apenas uma exceção genérica.
+
+## Checklist de entrega
+
+- [x] `seu-script-criacao.sql` com as tabelas do projeto.
+- [x] `seu-script-dados.sql` com dados de teste.
+- [ ] Scripts executados no schema Oracle correto.
+- [x] `ConexaoBanco.java` com `getConexao()` e `fechar(Connection)`.
+- [x] DAOs de equipe, trecho e intervenção.
+- [x] `RelatorioPrioridadeDAO` integrado ao `GeradorRelatorio`.
+- [x] `Main.java` demonstrando conexão, CRUD e relatório.
+- [ ] Teste de integração executado após a criação das tabelas.
+
+## Execução
+
+Linux/macOS:
+
+```bash
+javac -cp "lib/ojdbc17.jar" -d out $(find src -name "*.java")
+java -cp "out:lib/ojdbc17.jar" Main.Main
+```
+
+Windows PowerShell:
+
+```powershell
+javac -cp "lib/ojdbc17.jar" -d out (Get-ChildItem -Recurse src -Filter *.java).FullName
+java -cp "out;lib/ojdbc17.jar" Main.Main
+```
