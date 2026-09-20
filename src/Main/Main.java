@@ -1,31 +1,71 @@
 package Main;
 
 import Model.TrechoRodovia;
-import dao.*;
+import dao.EquipeManutencaoDAO;
+import dao.IntervencaoOperacionalDAO;
+import dao.RelatorioPrioridadeDAO;
+import dao.TrechoRodoviaDAO;
 import database.ConexaoBanco;
-import model.*;
+import exception.CredenciaisInvalidasException;
+import model.EquipeManutencao;
+import model.IntervencaoRegistro;
 import service.GeradorRelatorio;
 
-/** Demonstração completa do CRUD e da persistência do relatório. */
+/** Demonstração de conexão, inserção, CRUD e persistência do relatório. */
 public class Main {
     public static void main(String[] args) {
-        ConexaoBanco.getInstancia().conectar();
-        EquipeManutencaoDAO equipes=new EquipeManutencaoDAO();
-        int equipeId = equipes.inserir(new model.EquipeManutencao("Equipe Norte","Roçada"));
-        System.out.println(equipes.buscarPorId(equipeId));
-        equipes.atualizar(new model.EquipeManutencao(equipeId,"Equipe Norte","Roçada e poda"));
+        java.sql.Connection conexao = null;
 
-        TrechoRodoviaDAO trechos = new TrechoRodoviaDAO();
-        TrechoRodovia trecho = new TrechoRodovia(10,120,"umido",equipeId);
-        trechos.inserir(trecho);
-        System.out.println(trechos.listarTodas());
+        try {
+            // A classe ConexaoBanco foi mantida no formato original.
+            conexao = ConexaoBanco.getConexao();
 
-        IntervencaoOperacionalDAO intervencoes=new IntervencaoOperacionalDAO();
-        int intervencaoId=intervencoes.inserir(new model.IntervencaoRegistro(10,"ROÇADA_MECANIZADA","Equipe Norte"));
-        System.out.println(intervencoes.buscarPorId(intervencaoId));
-        new GeradorRelatorio().gerarRelatorio(trechos.listarTodas().toArray(TrechoRodovia[]::new));
-        new RelatorioPrioridadeDAO().listarTodas().forEach(System.out::println);
-        // Descomente após validar os registros: equipes.deletar(equipeId); trechos.deletar(10); intervencoes.deletar(intervencaoId);
-        ConexaoBanco.getInstancia().desconectar();
+            EquipeManutencaoDAO equipes = new EquipeManutencaoDAO();
+            int equipeId = equipes.inserir(
+                    new EquipeManutencao("Equipe Norte", "Roçada")
+            );
+            System.out.println("Equipe inserida: " + equipes.buscarPorId(equipeId));
+
+            equipes.atualizar(new EquipeManutencao(
+                    equipeId, "Equipe Norte", "Roçada e poda"
+            ));
+            System.out.println("Equipe atualizada: " + equipes.buscarPorId(equipeId));
+
+            TrechoRodoviaDAO trechos = new TrechoRodoviaDAO();
+            TrechoRodovia trecho = new TrechoRodovia(
+                    10, 120, "umido", equipeId
+            );
+            trechos.inserir(trecho);
+            System.out.println("Trechos cadastrados: " + trechos.listarTodas());
+
+            IntervencaoOperacionalDAO intervencoes = new IntervencaoOperacionalDAO();
+            int intervencaoId = intervencoes.inserir(new IntervencaoRegistro(
+                    10, "ROCADA_MECANIZADA", "Equipe Norte"
+            ));
+            System.out.println("Intervenção inserida: "
+                    + intervencoes.buscarPorId(intervencaoId));
+
+            TrechoRodovia[] trechosParaRelatorio = trechos.listarTodas()
+                    .toArray(new TrechoRodovia[0]);
+            new GeradorRelatorio().gerarRelatorio(trechosParaRelatorio);
+
+            System.out.println("Histórico de relatórios:");
+            new RelatorioPrioridadeDAO().listarTodas()
+                    .forEach(System.out::println);
+
+            // Para testar as exclusões, execute-as nesta ordem devido às FKs:
+            // intervencoes.deletar(intervencaoId);
+            // trechos.deletar(trecho.getKm());
+            // equipes.deletar(equipeId);
+
+        } catch (CredenciaisInvalidasException e) {
+            System.err.println(e.getMessage());
+            System.err.println(e.getDicaCorrecao());
+        } catch (RuntimeException e) {
+            System.err.println("Erro durante a demonstração: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            ConexaoBanco.fechar(conexao);
+        }
     }
 }
