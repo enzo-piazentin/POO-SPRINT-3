@@ -12,8 +12,8 @@ public class ConexaoBanco {
     private static final String HOST = "oracle.fiap.com.br";
     private static final String PORT = "1521";
     private static final String SID = "ORCL";
-    private static final String USER = "seu_usuario_fiap";  // Substituir
-    private static final String PASSWORD = "sua_senha_fiap"; // Substituir
+    private static final String USER = "rm564216";  // Substituir
+    private static final String PASSWORD = "171006"; // Substituir
 
     /**
      * Cria uma nova conexão com o Oracle.
