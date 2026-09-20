@@ -14,6 +14,7 @@ O sistema permite:
 - gerar e salvar relatório de prioridade no banco;
 - validar entradas do usuário antes de persistir os dados.
 
+
 ## Estrutura principal
 
 - `src/Main/Main.java` — menu inicial do sistema
@@ -257,3 +258,22 @@ SELECT * FROM INTERVENCAO_OPERACIONAL;
 ```
 
 Se todas as tabelas estiverem vazias, o projeto pode iniciar normalmente e você pode cadastrar os dados pelo menu.
+
+## Funcional
+<img width="642" height="600" alt="Captura de tela 2026-09-20 153606" src="https://github.com/user-attachments/assets/5a85fdfd-e4a9-4d46-b5ed-135b06a9de5c" />
+
+<img width="902" height="495" alt="Captura de tela 2026-09-20 153625" src="https://github.com/user-attachments/assets/e8a893c6-b82d-45ed-a0db-2f10a41e0f17" />
+
+<img width="958" height="705" alt="Captura de tela 2026-09-20 153844" src="https://github.com/user-attachments/assets/a9a1a1e7-402f-4994-b655-dab8b219f6d0" />
+
+<img width="397" height="476" alt="Captura de tela 2026-09-20 153930" src="https://github.com/user-attachments/assets/8f351cb4-78d2-4c9d-a4d0-513a990f788b" />
+
+<img width="748" height="458" alt="Captura de tela 2026-09-20 154130" src="https://github.com/user-attachments/assets/3e028a81-9fb4-457e-ae80-f99f3bf1a4af" />
+
+<img width="1197" height="402" alt="Captura de tela 2026-09-20 154153" src="https://github.com/user-attachments/assets/7085ba83-6652-415a-ab07-5b6306604a8c" />
+
+<img width="1462" height="792" alt="Captura de tela 2026-09-20 154232" src="https://github.com/user-attachments/assets/9415f937-2ca0-46b1-914c-7078d8050646" />
+
+<img width="1411" height="298" alt="Captura de tela 2026-09-20 154257" src="https://github.com/user-attachments/assets/ba8a13f3-dddc-4618-90f5-cdf90957893d" />
+
+<img width="568" height="387" alt="Captura de tela 2026-09-20 154322" src="https://github.com/user-attachments/assets/daf8951f-82ce-49e3-b06a-3c54714de1b4" />
