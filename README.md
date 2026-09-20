@@ -303,7 +303,6 @@ Se todas as tabelas estiverem vazias, o projeto pode iniciar normalmente e você
 
 <img width="1411" height="298" alt="Captura de tela 2026-09-20 154257" src="https://github.com/user-attachments/assets/ba8a13f3-dddc-4618-90f5-cdf90957893d" />
 
-<img width="1307" height="148" alt="image" src="https://github.com/user-attachments/assets/917ee76e-97b4-4423-b45c-79a9d001dc75" />
-
-
 <img width="568" height="387" alt="Captura de tela 2026-09-20 154322" src="https://github.com/user-attachments/assets/daf8951f-82ce-49e3-b06a-3c54714de1b4" />
+
+<img width="1307" height="148" alt="image" src="https://github.com/user-attachments/assets/917ee76e-97b4-4423-b45c-79a9d001dc75" />
